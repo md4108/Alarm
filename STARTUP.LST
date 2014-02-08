@@ -1,0 +1,249 @@
+8051 Assembler           Version 1.00   01/31/113 00:16:01    Page 1
+C:\Users\NAIMESH\Desktop\Meet\Keil Projects\Alarm\STARTUP.A51
+
+
+
+    2 0000              ;------------------------------------------------------------------------------
+    3 0000              ;  This file is part of the C51 Compiler package
+    4 0000              ;  Copyright (c) 1988-2005 Keil Elektronik GmbH and Keil Software, Inc.
+    5 0000              ;  Version 8.01
+    6 0000              ;
+    7 0000              ;  *** <<< Use Configuration Wizard in Context Menu >>> ***
+    8 0000              ;------------------------------------------------------------------------------
+    9 0000              ;  STARTUP.A51:  This code is executed after processor reset.
+   10 0000              ;
+   11 0000              ;  To translate this file use A51 with the following invocation:
+   12 0000              ;
+   13 0000              ;     A51 STARTUP.A51
+   14 0000              ;
+   15 0000              ;  To link the modified STARTUP.OBJ file to your application use the following
+   16 0000              ;  Lx51 invocation:
+   17 0000              ;
+   18 0000              ;     Lx51 your object file list, STARTUP.OBJ  controls
+   19 0000              ;
+   20 0000              ;------------------------------------------------------------------------------
+   21 0000              ;
+   22 0000              ;  User-defined <h> Power-On Initialization of Memory
+   23 0000              ;
+   24 0000              ;  With the following EQU statements the initialization of memory
+   25 0000              ;  at processor reset can be defined:
+   26 0000              ;
+   27 0000              ; <o> IDATALEN: IDATA memory size <0x0-0x100>
+   28 0000              ;     <i> Note: The absolute start-address of IDATA memory is always 0
+   29 0000              ;     <i>       The IDATA space overlaps physically the DATA and BIT areas.
+   30 0000              IDATALEN        EQU     80H
+   31 0000              ;
+   32 0000              ; <o> XDATASTART: XDATA memory start address <0x0-0xFFFF> 
+   33 0000              ;     <i> The absolute start address of XDATA memory
+   34 0000              XDATASTART      EQU     0     
+   35 0000              ;
+   36 0000              ; <o> XDATALEN: XDATA memory size <0x0-0xFFFF> 
+   37 0000              ;     <i> The length of XDATA memory in bytes.
+   38 0000              XDATALEN        EQU     0      
+   39 0000              ;
+   40 0000              ; <o> PDATASTART: PDATA memory start address <0x0-0xFFFF> 
+   41 0000              ;     <i> The absolute start address of PDATA memory
+   42 0000              PDATASTART      EQU     0H
+   43 0000              ;
+   44 0000              ; <o> PDATALEN: PDATA memory size <0x0-0xFF> 
+   45 0000              ;     <i> The length of PDATA memory in bytes.
+   46 0000              PDATALEN        EQU     0H
+   47 0000              ;
+   48 0000              ;</h>
+   49 0000              ;------------------------------------------------------------------------------
+   50 0000              ;
+   51 0000              ;<h> Reentrant Stack Initialization
+   52 0000              ;
+   53 0000              ;  The following EQU statements define the stack pointer for reentrant
+   54 0000              ;  functions and initialized it:
+   55 0000              ;
+   56 0000              ; <h> Stack Space for reentrant functions in the SMALL model.
+   57 0000              ;  <q> IBPSTACK: Enable SMALL model reentrant stack
+   58 0000              ;     <i> Stack space for reentrant functions in the SMALL model.
+8051 Assembler           Version 1.00   01/31/113 00:16:01    Page 2
+C:\Users\NAIMESH\Desktop\Meet\Keil Projects\Alarm\STARTUP.A51
+
+
+
+   59 0000              IBPSTACK        EQU     0       ; set to 1 if small reentrant is used.
+   60 0000              ;  <o> IBPSTACKTOP: End address of SMALL model stack <0x0-0xFF>
+   61 0000              ;     <i> Set the top of the stack to the highest location.
+   62 0000              IBPSTACKTOP     EQU     0xFF +1     ; default 0FFH+1  
+   63 0000              ; </h>
+   64 0000              ;
+   65 0000              ; <h> Stack Space for reentrant functions in the LARGE model.      
+   66 0000              ;  <q> XBPSTACK: Enable LARGE model reentrant stack
+   67 0000              ;     <i> Stack space for reentrant functions in the LARGE model.
+   68 0000              XBPSTACK        EQU     0       ; set to 1 if large reentrant is used.
+   69 0000              ;  <o> XBPSTACKTOP: End address of LARGE model stack <0x0-0xFFFF>
+   70 0000              ;     <i> Set the top of the stack to the highest location.
+   71 0000              XBPSTACKTOP     EQU     0xFFFF +1   ; default 0FFFFH+1 
+   72 0000              ; </h>
+   73 0000              ;
+   74 0000              ; <h> Stack Space for reentrant functions in the COMPACT model.    
+   75 0000              ;  <q> PBPSTACK: Enable COMPACT model reentrant stack
+   76 0000              ;     <i> Stack space for reentrant functions in the COMPACT model.
+   77 0000              PBPSTACK        EQU     0       ; set to 1 if compact reentrant is used.
+   78 0000              ;
+   79 0000              ;   <o> PBPSTACKTOP: End address of COMPACT model stack <0x0-0xFFFF>
+   80 0000              ;     <i> Set the top of the stack to the highest location.
+   81 0000              PBPSTACKTOP     EQU     0xFF +1     ; default 0FFH+1  
+   82 0000              ; </h>
+   83 0000              ;</h>
+   84 0000              ;------------------------------------------------------------------------------
+   85 0000              ;
+   86 0000              ;  Memory Page for Using the Compact Model with 64 KByte xdata RAM
+   87 0000              ;  <e>Compact Model Page Definition
+   88 0000              ;
+   89 0000              ;  <i>Define the XDATA page used for PDATA variables. 
+   90 0000              ;  <i>PPAGE must conform with the PPAGE set in the linker invocation.
+   91 0000              ;
+   92 0000              ; Enable pdata memory page initalization
+   93 0000              PPAGEENABLE     EQU     0       ; set to 1 if pdata object are used.
+   94 0000              ;
+   95 0000              ; <o> PPAGE number <0x0-0xFF> 
+   96 0000              ; <i> uppermost 256-byte address of the page used for PDATA variables.
+   97 0000              PPAGE           EQU     0
+   98 0000              ;
+   99 0000              ; <o> SFR address which supplies uppermost address byte <0x0-0xFF> 
+  100 0000              ; <i> most 8051 variants use P2 as uppermost address byte
+  101 0000              PPAGE_SFR       DATA    0A0H
+  102 0000              ;
+  103 0000              ; </e>
+  104 0000              ;------------------------------------------------------------------------------
+  105 0000              
+  106 0000              ; Standard SFR Symbols 
+  107 0000              ACC     DATA    0E0H
+  108 0000              B       DATA    0F0H
+  109 0000              SP      DATA    81H
+  110 0000              DPL     DATA    82H
+  111 0000              DPH     DATA    83H
+  112 0000              
+  114 0000              
+  115 0000              
+                        ?C_C51STARTUP   SEGMENT   CODE
+8051 Assembler           Version 1.00   01/31/113 00:16:01    Page 3
+C:\Users\NAIMESH\Desktop\Meet\Keil Projects\Alarm\STARTUP.A51
+
+
+
+                        ?STACK          SEGMENT   IDATA
+  118 0000              
+  120                                   DS      1
+  121 0000              
+                                        EXTRN CODE (?C_START)
+  124 0000              
+                                        CSEG    AT      0
+  126 0000 020003       ?C_STARTUP:     LJMP    STARTUP1
+  127 0003              
+  129 0003              
+  130 0003              STARTUP1:
+  131 0003              
+  132 0003              IF IDATALEN <> 0
+  133 0003 787F                         MOV     R0,#IDATALEN - 1
+  134 0005 E4                           CLR     A
+  135 0006 F6           IDATALOOP:      MOV     @R0,A
+  136 0007 D8FD                         DJNZ    R0,IDATALOOP
+  137 0009              ENDIF
+  138 0009              
+  139 0009              IF XDATALEN <> 0
+  140 0009                              MOV     DPTR,#XDATASTART
+  141 0009                              MOV     R7,#LOW (XDATALEN)
+  142 0009                IF (LOW (XDATALEN)) <> 0
+  143 0009                              MOV     R6,#(HIGH (XDATALEN)) +1
+  144 0009                ELSE
+  145 0009 7E00                         MOV     R6,#HIGH (XDATALEN)
+  146 000B                ENDIF
+  147 000B E4                           CLR     A
+  148 000C F0           XDATALOOP:      MOVX    @DPTR,A
+  149 000D A3                           INC     DPTR
+  150 000E DFFC                         DJNZ    R7,XDATALOOP
+  151 0010 DEFA                         DJNZ    R6,XDATALOOP
+  152 0012              ENDIF
+  153 0012              
+  154 0012              IF PPAGEENABLE <> 0
+  155 0012                              MOV     PPAGE_SFR,#PPAGE
+  156 0012              ENDIF
+  157 0012              
+  158 0012              IF PDATALEN <> 0
+  159 0012                              MOV     R0,#LOW (PDATASTART)
+  160 0012                              MOV     R7,#LOW (PDATALEN)
+  161 0012                              CLR     A
+  162 0012              PDATALOOP:      MOVX    @R0,A
+  163 0012                              INC     R0
+  164 0012                              DJNZ    R7,PDATALOOP
+  165 0012              ENDIF
+  166 0012              
+  167 0012              IF IBPSTACK <> 0
+  168 0012              EXTRN DATA (?C_IBP)
+  169 0012              
+  170 0012                              MOV     ?C_IBP,#LOW IBPSTACKTOP
+  171 0012              ENDIF
+  172 0012              
+  173 0012              IF XBPSTACK <> 0
+  174 0012              EXTRN DATA (?C_XBP)
+  175 0012              
+  176 0012                              MOV     ?C_XBP,#HIGH XBPSTACKTOP
+8051 Assembler           Version 1.00   01/31/113 00:16:01    Page 4
+C:\Users\NAIMESH\Desktop\Meet\Keil Projects\Alarm\STARTUP.A51
+
+
+
+  177 0012                              MOV     ?C_XBP+1,#LOW XBPSTACKTOP
+  178 0012              ENDIF
+  179 0012              
+  180 0012              IF PBPSTACK <> 0
+  181 0012              EXTRN DATA (?C_PBP)
+  182 0012                              MOV     ?C_PBP,#LOW PBPSTACKTOP
+  183 0012              ENDIF
+  184 0012              
+
+                                        MOV     SP,#?STACK-1
+ **** Error  :  Undefined symbol/label: 
+  185 0012 7581FF                       MOV     SP,#?STACK-1
+  186 0015              
+  187 0015              ; This code is required if you use L51_BANK.A51 with Banking Mode 4
+  188 0015              ;<h> Code Banking
+  189 0015              ; <q> Select Bank 0 for L51_BANK.A51 Mode 4
+                        #if 0   
+  191 0015              ;     <i> Initialize bank mechanism to code bank 0 when using L51_BANK.A51 with Banking Mode 4.
+                        EXTRN CODE (?B_SWITCH0)
+
+                                        CALL    ?B_SWITCH0      ; init bank mechanism to code bank 0
+ **** Error  :  Undefined symbol/label: 
+  193 0015 120000                       CALL    ?B_SWITCH0      ; init bank mechanism to code bank 0
+                        #endif
+  195 0018              ;</h>
+
+                                        LJMP    ?C_START
+ **** Error  :  Undefined symbol/label: 
+  196 0018 020000                       LJMP    ?C_START
+  197 001B              
+  198 001B                              END
+
+Defined Symbols:
+  ACC                                       0000E0  224
+  B                                         0000F0  240
+  DPH                                       000083  131
+  DPL                                       000082  130
+  IBPSTACK                                  000000  0
+  IBPSTACKTOP                               000001  1
+  IDATALEN                                  000080  128
+  PBPSTACK                                  000000  0
+  PBPSTACKTOP                               000001  1
+  PDATALEN                                  000000  0
+  PDATASTART                                000000  0
+  PPAGE                                     000000  0
+  PPAGE_SFR                                 0000A0  160
+  PPAGEENABLE                               000000  0
+  SP                                        000081  129
+  XBPSTACK                                  000000  0
+  XBPSTACKTOP                               000001  1
+  XDATALEN                                  000000  0
+  XDATASTART                                000000  0
+
+Defined Labels:
+  ?C_STARTUP                                000000  0
+  IDATALOOP                                 000006  6
+  STARTUP1                                  000003  3
+  XDATALOOP                                 00000C  12

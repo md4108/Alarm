@@ -1,0 +1,274 @@
+C51 COMPILER V8.12   ALARM                                                                 11/17/2012 16:35:57 PAGE 1   
+
+
+C51 COMPILER V8.12, COMPILATION OF MODULE ALARM
+OBJECT MODULE PLACED IN alarm.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE alarm.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include<reg51.h>
+   2          #define port P1
+   3          #define cont_port P0
+   4          #define dataport P2  //Data port for LCD
+   5          #define m_sec 10
+   6          sbit rs = cont_port^1;
+   7          sbit rw = cont_port^2;
+   8          sbit en = cont_port^0;
+   9          sbit dig_hr1=port^0;
+  10          sbit dig_min1=port^1;
+  11          sbit start=port^2;
+  12          sbit am_pm=port^3;
+  13          sbit alarm_set=port^4;
+  14          sbit alarm=port^7;
+  15          int hr ,hr1=0,alarm_hr=0;
+  16          int min,min1=0,alarm_min=0;
+  17          int sec,sec1=0,dig_am_pm=0,alarm_am_pm=0;
+  18          
+  19          void delay(unsigned int msec) // Time delay function
+  20          {
+  21   1      int i,j ;
+  22   1      for(i=0;i<msec;i++)
+  23   1        for(j=0;j<1275;j++);
+  24   1      }
+  25          
+  26                          
+  27          void lcd_cmd(unsigned char item) //Function to send command to LCD
+  28          {
+  29   1      dataport = item;
+  30   1      rs= 0;
+  31   1      rw=0;
+  32   1      en=1;
+  33   1      delay(1);
+  34   1      en=0;
+  35   1      return;
+  36   1      }
+  37          
+  38          void lcd_data(unsigned char item) // Function to send data to LCD
+  39          {
+  40   1      dataport = item;
+  41   1      rs= 1;
+  42   1      rw=0;
+  43   1      en=1;
+  44   1      delay(1);
+  45   1      en=0;
+  46   1      return;
+  47   1      }
+  48          
+  49          void lcd_data_string(unsigned char *str) // Function to send string to LCD
+  50          {
+  51   1      int i=0;
+  52   1      while(str[i]!='\0')
+  53   1      {
+  54   2        lcd_data(str[i]);
+  55   2        i++;
+C51 COMPILER V8.12   ALARM                                                                 11/17/2012 16:35:57 PAGE 2   
+
+  56   2        delay(1);
+  57   2      }
+  58   1      return;
+  59   1      }
+  60          
+  61          lcd_data_int(int time_val) // Function to send number to LCD
+  62          {
+  63   1      int int_amt;
+  64   1      int_amt=time_val/10;
+  65   1      lcd_data(int_amt+48);
+  66   1      int_amt=time_val%10; 
+  67   1      lcd_data(int_amt+48);
+  68   1      }
+  69          
+  70          void lcd(unsigned char str1[10])
+  71          {
+  72   1      lcd_cmd(0x38); 
+  73   1      lcd_cmd(0x0e); 
+  74   1      delay(1);
+  75   1      lcd_data_string(str1);
+  76   1      }
+  77          
+  78          void set_hr1() // // Function to set hours digit of clock
+  79          {
+  80   1      hr1++;
+  81   1      if(hr1>11)
+  82   1      hr1=0;
+  83   1      lcd_cmd(0xc3);
+  84   1      lcd_data_int(hr1);
+  85   1      lcd_data(':');
+  86   1      }
+  87          
+  88          void set_min1()  // Function to set minutes digit of clock
+  89          {
+  90   1      min1++;
+  91   1      if(min1>59)
+  92   1      min1=0;
+  93   1      lcd_cmd(0xc6);
+  94   1      lcd_data_int(min1);
+  95   1      }
+  96          
+  97          void set_alarm_hr1()  // Function to set hours digit of alarm
+  98          {
+  99   1      alarm_hr++;
+ 100   1      if(alarm_hr>11)
+ 101   1      alarm_hr=0;
+ 102   1      lcd_cmd(0xc3);
+ 103   1      lcd_data_int(alarm_hr);
+ 104   1      lcd_data(':');
+ 105   1      }
+ 106          
+ 107          void set_alarm_min1() // Function to set minutes digit of Alarm
+ 108          {
+ 109   1      alarm_min++;
+ 110   1      if(alarm_min>59)
+ 111   1      alarm_min=0;
+ 112   1      lcd_cmd(0xc6);
+ 113   1      lcd_data_int(alarm_min);
+ 114   1      }
+ 115          
+ 116          void alarm_check()   // Function to check alarm
+ 117          {
+C51 COMPILER V8.12   ALARM                                                                 11/17/2012 16:35:57 PAGE 3   
+
+ 118   1      if(hr==alarm_hr)
+ 119   1      {
+ 120   2        if(min==alarm_min)
+ 121   2        {
+ 122   3         if(dig_am_pm==alarm_am_pm)
+ 123   3         {
+ 124   4         alarm=1;
+ 125   4         lcd_cmd(0xc5);
+ 126   4         lcd("ALARM");
+ 127   4         delay(10);
+ 128   4         alarm = 0;
+ 129   4         }
+ 130   3        }
+ 131   2      } 
+ 132   1      }
+ 133          
+ 134          void main()
+ 135          {
+ 136   1      int k;
+ 137   1      start=1;
+ 138   1      dig_hr1=1;
+ 139   1      dig_min1=1;
+ 140   1      alarm_set=1;
+ 141   1      alarm=0;
+ 142   1      lcd_cmd(0x83);
+ 143   1      lcd("SET ALARM");
+ 144   1      lcd_cmd(0xc3);
+ 145   1      lcd_data_int(hr1);
+ 146   1      lcd_data(':');
+ 147   1      lcd_data_int(min1);
+ 148   1      
+ 149   1      while(alarm_set==0)
+ 150   1      {
+ 151   2        delay(10);
+ 152   2        if(dig_hr1==0)
+ 153   2        set_alarm_hr1();
+ 154   2        if(dig_min1==0)
+ 155   2        set_alarm_min1();
+ 156   2      }
+ 157   1      
+ 158   1      if(am_pm==0)
+ 159   1      {
+ 160   2        lcd_cmd(0xc8);
+ 161   2        lcd_data_string("am");
+ 162   2        alarm_am_pm=0;
+ 163   2      }
+ 164   1      
+ 165   1      if(am_pm==1)
+ 166   1      {
+ 167   2        lcd_cmd(0xc8);
+ 168   2        lcd_data_string("pm");
+ 169   2        alarm_am_pm=1;
+ 170   2      }
+ 171   1      delay(200);
+ 172   1      lcd_cmd(0x01);
+ 173   1      lcd_cmd(0x83);
+ 174   1      lcd("SET TIMING");
+ 175   1      lcd_cmd(0xc3);
+ 176   1      lcd_data_int(hr1);
+ 177   1      lcd_data(':');
+ 178   1      lcd_data_int(min1);
+ 179   1      
+C51 COMPILER V8.12   ALARM                                                                 11/17/2012 16:35:57 PAGE 4   
+
+ 180   1      while(start==0)
+ 181   1      {
+ 182   2        delay(10);
+ 183   2        if(dig_hr1==0)
+ 184   2        set_hr1();
+ 185   2        if(dig_min1==0)
+ 186   2        set_min1(); 
+ 187   2      }
+ 188   1      
+ 189   1      if(am_pm==0)
+ 190   1      {
+ 191   2        lcd_cmd(0xc8);
+ 192   2        lcd_data_string("am");
+ 193   2        dig_am_pm=0;
+ 194   2      }
+ 195   1      
+ 196   1      if(am_pm==1)
+ 197   1      {
+ 198   2        lcd_cmd(0xc8);
+ 199   2        lcd_data_string("pm");
+ 200   2        dig_am_pm=1;
+ 201   2      }
+ 202   1      delay(200);
+ 203   1      lcd_cmd(0x01);
+ 204   1      while(1)
+ 205   1      {
+ 206   2        for(k=0;k<2;k++)
+ 207   2        {
+ 208   3         for(hr=hr1;hr<12;hr++)
+ 209   3         {
+ 210   4          for(min=min1;min<60;min++)
+ 211   4          {
+ 212   5           for(sec=0;sec<60;sec++)
+ 213   5           {
+ 214   6            lcd_cmd(0x82);
+ 215   6            delay(1);
+ 216   6            lcd_data_int(hr);
+ 217   6            lcd_data(':');
+ 218   6            lcd_data_int(min);
+ 219   6            lcd_data(':');
+ 220   6            lcd_data_int(sec);
+ 221   6            if(dig_am_pm==0)
+ 222   6            {
+ 223   7             lcd("am");
+ 224   7            }
+ 225   6            else
+ 226   6            {
+ 227   7             lcd("pm");
+ 228   7            }
+ 229   6            delay(80);
+ 230   6            alarm_check();
+ 231   6            lcd_data_string("    ");
+ 232   6           }
+ 233   5          }
+ 234   4         min1=0;
+ 235   4         }
+ 236   3        if(dig_am_pm==0)
+ 237   3        dig_am_pm=1;
+ 238   3        else
+ 239   3        dig_am_pm=0;
+ 240   3        hr1=0;
+ 241   3        }
+C51 COMPILER V8.12   ALARM                                                                 11/17/2012 16:35:57 PAGE 5   
+
+ 242   2      }
+ 243   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    808    ----
+   CONSTANT SIZE    =     38    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     20      10
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
